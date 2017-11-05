@@ -1,0 +1,6 @@
+.DS_Store
+dailybibleverse.xcodeproj/xcuserdata/
+dailybibleverse.xcworkspace/xcuserdata/
+DerivedData/
+Pods/
+Build/
