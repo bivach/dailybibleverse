@@ -292,5 +292,19 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         present(alert, animated: true, completion: nil)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if case .success(let scriptureData) = viewModel.state.value {
+            let realm = try! Realm()
+            
+            let date2 = "scripture_date == '\(scriptureData.scripture_date!)'"
+            
+            if(realm.objects(ScriptureRealm.self).filter(date2).count > 0) {
+                heartButton.setImage(UIImage(named: "HeartRed.png"), for: .normal)
+            } else {
+                heartButton.setImage(UIImage(named: "Heart.png"), for: .normal)
+            }
+        }
+    }
+    
 }
 

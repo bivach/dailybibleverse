@@ -140,6 +140,7 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         if (scripts.count > 0) {
             try! realm.write {
                 realm.delete(scripts.first!)
+                dismiss(animated: true, completion: nil)
             }
             return false
         } else {

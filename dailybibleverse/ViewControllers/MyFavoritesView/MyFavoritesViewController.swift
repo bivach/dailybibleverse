@@ -88,5 +88,10 @@ class MyFavoritesViewController : UIViewController, UITableViewDelegate, UITable
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+        setState()
+    }
+    
     
 }
