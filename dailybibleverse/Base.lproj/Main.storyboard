@@ -157,6 +157,20 @@
                                     <constraint firstItem="Lqj-Kg-XdJ" firstAttribute="centerX" secondItem="z3n-1b-Bxl" secondAttribute="centerX" id="Z7H-wM-j8j"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5sm-h6-dd4">
+                                <rect key="frame" x="115" y="266.5" width="90" height="35"/>
+                                <color key="backgroundColor" red="1" green="0.83107152259221806" blue="0.79095261592973098" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="90" id="LEa-c7-2Qn"/>
+                                    <constraint firstAttribute="height" constant="35" id="nrX-JA-Gkp"/>
+                                </constraints>
+                                <state key="normal" title="Retry">
+                                    <color key="titleColor" red="0.33632205310880825" green="0.30940983788108251" blue="0.27667106752013743" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                </state>
+                                <connections>
+                                    <action selector="retryAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3xS-Lz-Ma8"/>
+                                </connections>
+                            </button>
                             <view hidden="YES" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fp7-Kd-KdW">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <subviews>
@@ -325,20 +339,6 @@
                                     <constraint firstAttribute="bottom" secondItem="Kkj-AL-Os8" secondAttribute="bottom" id="yaP-Z8-1sY"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5sm-h6-dd4">
-                                <rect key="frame" x="115" y="266.5" width="90" height="35"/>
-                                <color key="backgroundColor" red="1" green="0.83107152259221806" blue="0.79095261592973098" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="90" id="LEa-c7-2Qn"/>
-                                    <constraint firstAttribute="height" constant="35" id="nrX-JA-Gkp"/>
-                                </constraints>
-                                <state key="normal" title="Retry">
-                                    <color key="titleColor" red="0.33632205310880825" green="0.30940983788108251" blue="0.27667106752013743" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                </state>
-                                <connections>
-                                    <action selector="retryAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3xS-Lz-Ma8"/>
-                                </connections>
-                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iTq-q2-Cho" customClass="GADBannerView">
                                 <rect key="frame" x="0.0" y="518" width="320" height="50"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
