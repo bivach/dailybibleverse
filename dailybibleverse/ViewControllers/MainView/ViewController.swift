@@ -169,9 +169,9 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     }
     
     func showMenu(_ show: Bool) {
-        self.menuView.isHidden = false
-        UIView.animate(withDuration: 0.4, animations: {
-            self.menuView.alpha = show ? 0.45 : 0
+        if show { self.menuView.isHidden = false }
+        UIView.animate(withDuration: 0.3, animations: {
+            self.menuView.alpha = show ? 1 : 0
         }) { (completion) in
             self.menuView.isHidden = show ? false : true
         }
