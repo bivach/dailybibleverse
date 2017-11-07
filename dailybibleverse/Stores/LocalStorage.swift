@@ -19,6 +19,7 @@ class LocalStorage {
     private let bibleVersionKey = "com.dailybible.bibleVersion"
     private let hasReminderKey = "com.dailybible.hasReminder"
     private let favoritesKey = "com.dailybible.favorites"
+    private let didTranslationChange = "com.dailybible.didTranslationChange"
 
 //    private let coreDataHelper = CoreDataStack.sharedInstance
 
@@ -85,5 +86,16 @@ class LocalStorage {
 
     func getHasReminder() -> Bool {
         return userDefaults.object(forKey: hasReminderKey) as? Bool ?? false
+    }
+    
+    //MARK: DidTranslationChange
+    
+    func setDidTranslationChange(_ bool: Bool) {
+        userDefaults.set(bool, forKey: didTranslationChange)
+        userDefaults.synchronize()
+    }
+    
+    func getDidTranslationChange() -> Bool {
+        return userDefaults.object(forKey: didTranslationChange) as? Bool ?? false
     }
 }

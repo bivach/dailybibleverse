@@ -28,6 +28,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     @IBOutlet weak var progressAnim: UIActivityIndicatorView!
     
     var viewModel = MainViewModel()
+    let sharedLocalStorage = LocalStorage.sharedInstance;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,47 +41,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             })
         viewModel.loadDailyVerse()
         
-        //Request
-        let request = GADRequest()
-        request.testDevices = [kGADSimulatorID]
-        
-        //Set Up Banner
-        bannerAdMob.adUnitID = "ca-app-pub-0219081932956726/4282096506"
-        
-        bannerAdMob.rootViewController = self
-        bannerAdMob.delegate = self
-        
-        bannerAdMob.load(request)
-        
-    }
-    
-    
-    var results: Array<Any> = [] {
-        didSet {
-            reloadActions()
-        }
-    }
-    
-    func reloadActions() {
-        // Override it to reloadData on tableView
-    }
-    
-    // MARK: - Public Interface
-    
-    func setInitialViewHidden(_ hidden: Bool) {
-        // Override it to show or hide Empty State
-    }
-    
-    func setEmptyStateHidden(_ hidden: Bool) {
-        // Override it to show or hide Empty State
-    }
-    
-    func setLoadingStateHidden(_ hidden: Bool) {
-        // Override it to show or hide Loading State
-    }
-    
-    func setErrorStateHidden(_ hidden: Bool) {
-        // Override it to show or hide Login State
+        setGADBannerView()
     }
     
     func stateHasChanged(_ state: MainViewModel.State) {
@@ -92,73 +53,16 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             
         case .success(let scriptureData):
             
-            UIView.animate(withDuration: 0.3
-                , animations: {
-                    self.retryButton.alpha = 0.0
-            }, completion: { completion in
-                self.retryButton.isHidden = true
-            })
-            
-            let realm = try! Realm()
-            
-            let date2 = "scripture_date == '\(scriptureData.scripture_date!)'"
-            
-            if(realm.objects(ScriptureRealm.self).filter(date2).count > 0) {
-                heartButton.setImage(UIImage(named: "HeartRed.png"), for: .normal)
-            } else {
-                heartButton.setImage(UIImage(named: "Heart.png"), for: .normal)
-            }
-            
-            UIView.animate(withDuration: 0.4
-                , animations: {
-                    self.progressView.alpha = 0.0
-            }, completion: { completion in
-                self.progressView.isHidden = true
-                
-            })
-            verseLabel.text = scriptureData.verses.first?.verse_text
-            if let bookName = scriptureData.book_name, let span = scriptureData.span {
-                bookLabel.text = "\(bookName) \(span)"
-            } else {
-                bookLabel.text = ""
-            }
-            
-            UIView.animate(withDuration: 5.0
-                , animations: {
-                    self.doveView.alpha = 0.3
-            }, completion: { completion in
-                self.doveView.isHidden = false
-            })
-            
-            
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-            let date = formatter.date(from: scriptureData.scripture_date ?? "")
-            
-            
-            let formatter2 = DateFormatter()
-            formatter2.dateFormat = "EEEE, MMMM dd, yyyy"
-            let string = formatter2.string(from: date!)
-            
-            dateLabel.text = string
+            showSuccesView(scriptureData: scriptureData)
             
         case .error:
-            progressAnim.isHidden = true
-            UIView.animate(withDuration: 0.4
-                , animations: {
-                    self.retryButton.alpha = 1
-            }, completion: { completion in
-                self.retryButton.isHidden = false
-            })
-            showAlert(service: "Internet")
+            
+            showErrorView()
             
         }
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+    //BUTTONS ACTIONS:
     
     @IBAction func openMenu(_ sender: UIButton) {
         showMenu(true)
@@ -199,8 +103,8 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             content.contentURL = NSURL(string: scriptureData.share_link!) as URL!
             FBSDKShareDialog.show(from: self, with: content, delegate: nil)
         }
-        
     }
+    
     @IBAction func googlePlusShareButton(_ sender: Any) {
         showGooglePlusShare(shareURL: NSURL())
     }
@@ -240,9 +144,11 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     @IBAction func settingsTouch(_ sender: Any) {
         showMenu(false)
     }
+    
     @IBAction func myFavoritesTouch(_ sender: Any) {
         showMenu(false)
     }
+    
     func sharePressed() {
         if case .success(let scriptureData) =
             viewModel.state.value {
@@ -284,6 +190,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         viewModel.state.value = .loading
         viewModel.loadDailyVerse()
     }
+    
     func showAlert(service:String) {
         let alert = UIAlertController(title: "Error", message: "You are not connected to \(service)", preferredStyle: .alert)
         let action = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
@@ -292,7 +199,18 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         present(alert, animated: true, completion: nil)
     }
     
+    
+    //LIFECYCLESMETHODS
+    
     override func viewWillAppear(_ animated: Bool) {
+        
+        if (sharedLocalStorage.getDidTranslationChange()) {
+            doveView.alpha = 0
+            progressAnim.isHidden = false
+            viewModel.state.value = .loading
+            viewModel.loadDailyVerse()
+            sharedLocalStorage.setDidTranslationChange(false)
+        }
         if case .success(let scriptureData) = viewModel.state.value {
             let realm = try! Realm()
             
@@ -304,6 +222,86 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
                 heartButton.setImage(UIImage(named: "Heart.png"), for: .normal)
             }
         }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+    
+    //SET VIEWS
+    
+    func setGADBannerView() {
+        
+        let request = GADRequest()
+        request.testDevices = [kGADSimulatorID]
+        
+        bannerAdMob.adUnitID = "ca-app-pub-0219081932956726/4282096506"
+        
+        bannerAdMob.rootViewController = self
+        bannerAdMob.delegate = self
+        
+        bannerAdMob.load(request)
+    }
+    
+    func showErrorView() {
+        progressAnim.isHidden = true
+        UIView.animate(withDuration: 0.4
+            , animations: {
+                self.retryButton.alpha = 1
+        }, completion: { completion in
+            self.retryButton.isHidden = false
+        })
+        showAlert(service: "Internet")
+    }
+    
+    func showSuccesView(scriptureData: ScriptureData) {
+        UIView.animate(withDuration: 0.3
+            , animations: {
+                self.retryButton.alpha = 0.0
+        }, completion: { completion in
+            self.retryButton.isHidden = true
+        })
+        
+        let realm = try! Realm()
+        
+        let date2 = "scripture_date == '\(scriptureData.scripture_date!)'"
+        
+        if(realm.objects(ScriptureRealm.self).filter(date2).count > 0) {
+            heartButton.setImage(UIImage(named: "HeartRed.png"), for: .normal)
+        } else {
+            heartButton.setImage(UIImage(named: "Heart.png"), for: .normal)
+        }
+        
+        UIView.animate(withDuration: 0.4, animations: {
+            self.progressView.alpha = 0.0
+        }, completion: { completion in
+            self.progressView.isHidden = true
+        })
+        
+        verseLabel.text = scriptureData.verses.first?.verse_text
+        if let bookName = scriptureData.book_name, let span = scriptureData.span {
+            bookLabel.text = "\(bookName) \(span)"
+        } else {
+            bookLabel.text = ""
+        }
+        
+        UIView.animate(withDuration: 5.0, animations: {
+            self.doveView.alpha = 0.3
+        }, completion: { completion in
+            self.doveView.isHidden = false
+        })
+        
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        let date = formatter.date(from: scriptureData.scripture_date ?? "")
+        
+        
+        let formatter2 = DateFormatter()
+        formatter2.dateFormat = "EEEE, MMMM dd, yyyy"
+        let string = formatter2.string(from: date!)
+        
+        dateLabel.text = string
     }
     
 }

@@ -14,7 +14,7 @@ import Foundation
 
 class DailyBibleVerseStore : BaseStore {
     static let sharedStore = DailyBibleVerseStore()
-    let sharedLocalStorage = LocalStorage.sharedInstance;
+    let sharedLocalStorage = LocalStorage.sharedInstance
     
     func getDailyVerse(result :String) -> Observable<ScriptureData> {
         let parameter = [
