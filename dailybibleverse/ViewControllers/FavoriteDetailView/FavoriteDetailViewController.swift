@@ -24,6 +24,7 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     @IBOutlet weak var verseLabel: UILabel!
     @IBOutlet weak var doveView: UIImageView!
     @IBOutlet weak var translationLabel: UILabel!
+    @IBOutlet weak var menuView: UIView!
     
     let localStorage = LocalStorage.sharedInstance
     //    @IBOutlet weak var dateLabel: UILabel!
@@ -76,6 +77,27 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     override func viewWillAppear(_ animated: Bool) {
         translationLabel.text = localStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
         verseLabel.text = localStorage.getBibleVersion() == 1 ? "\(realmFavorite!["verseKJV"]!)" : "\(realmFavorite!["verseNIV"]!)"
+    }
+
+    func showMenu(_ show: Bool) {
+        if show { self.menuView.isHidden = false }
+        UIView.animate(withDuration: 0.3, animations: {
+            self.menuView.alpha = show ? 1 : 0
+        }) { (completion) in
+            self.menuView.isHidden = show ? false : true
+        }
+    }
+
+    @IBAction func openMenu(_ sender: UIButton) {
+        showMenu(true)
+    }
+
+    @IBAction func closeMenu(_ sender: UIButton) {
+        showMenu(false)
+    }
+
+    @IBAction func shareButton(_ sender: UIButton) {
+        sharePressed()
     }
     
     @IBAction func heartButton(_ sender: Any) {
@@ -135,6 +157,13 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
             }
         }
     }
+
+    func sharePressed() {
+        showMenu(false)
+        let activityVc = UIActivityViewController(activityItems: [realmFavorite!.share_link ?? ""], applicationActivities: nil)
+        activityVc.popoverPresentationController?.sourceView = self.view
+        self.present(activityVc, animated: true, completion: nil)
+    }
     
     
     func addOrDeleteScriptureFromRealm(scriptureData : ScriptureRealm) {
@@ -191,6 +220,7 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
                 realm.add(realmFavorite!,update: true)
             }
     }
+    
     @IBAction func showTranslationAlert(_ sender: UIButton) {
         if(localStorage.getBibleVersion() == 1 ) {
             showAlertTranslation(service: "From the King James Version")
