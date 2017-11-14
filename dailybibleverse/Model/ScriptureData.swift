@@ -40,5 +40,9 @@ class ScriptureData : ResponseModel {
         share_link = json["share_link"].stringValue
     }
     
+    public func getFirtVerse() -> String {
+        return "\(self.verses.first?.verse_no ?? 1)  " + (self.verses.first?.verse_text)!
+    }
+    
     
 }

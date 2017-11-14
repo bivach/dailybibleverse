@@ -74,7 +74,7 @@ class LocalStorage {
     }
 
     func getBibleVersion() -> Int {
-        return userDefaults.object(forKey: bibleVersionKey) as? Int ?? 1
+        return userDefaults.object(forKey: bibleVersionKey) as? Int ?? 2
     }
 
     // MARK: - TimeReminder

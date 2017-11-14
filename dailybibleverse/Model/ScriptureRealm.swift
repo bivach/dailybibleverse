@@ -18,6 +18,8 @@ class ScriptureRealm : Object {
     public var verse_end : Int? = 0
     public var book_name : String? = ""
     public var verses : String? = ""
+    public var verseKJV : String? = ""
+    public var verseNIV : String? = ""
     public var span : String? = ""
     public var tweet : String? = ""
     public var share_link : String? = ""

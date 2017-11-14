@@ -17,8 +17,7 @@ struct Router {
     // MARK: - Router.MarketData
     
     enum ScriptureData: RouterRequest {
-        case scriptureData([String: Any])
-        case scriptureDataTranslate([String: Int])
+        case getScriptureDataTranslate([String: Any])
         
         var method: Alamofire.HTTPMethod {
             return .get
@@ -34,9 +33,7 @@ struct Router {
         
         var parameters: [String: Any]? {
             switch self {
-            case .scriptureData(let parameters):
-                return parameters
-            case .scriptureDataTranslate(let parameters):
+            case .getScriptureDataTranslate(let parameters):
                 return parameters
             }
         }

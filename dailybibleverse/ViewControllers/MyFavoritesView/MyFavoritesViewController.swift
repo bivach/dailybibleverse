@@ -18,7 +18,7 @@ class MyFavoritesViewController : UIViewController, UITableViewDelegate, UITable
     var favorites: RealmSwift.Results<ScriptureRealm>?
     
     @IBAction func close(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     
     override func viewDidLoad() {
@@ -81,17 +81,13 @@ class MyFavoritesViewController : UIViewController, UITableViewDelegate, UITable
         }
     }
     
-    
     func favoriteAtIndexPath(indexPath: NSIndexPath) -> ScriptureRealm {
-        
         return (self.favorites?[indexPath.row])!
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         tableView.reloadData()
         setState()
     }
-    
     
 }

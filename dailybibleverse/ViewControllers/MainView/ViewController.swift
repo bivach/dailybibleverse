@@ -16,6 +16,7 @@ import FBSDKShareKit
 
 class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewControllerDelegate {
     
+    @IBOutlet weak var loadingLabel: UILabel!
     @IBOutlet weak var bannerAdMob: GADBannerView!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var verseLabel: UILabel!
@@ -25,13 +26,17 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     @IBOutlet weak var doveView: UIImageView!
     @IBOutlet weak var heartButton: UIButton!
     @IBOutlet weak var retryButton: UIButton!
-    @IBOutlet weak var progressAnim: UIActivityIndicatorView!
+    @IBOutlet weak var translationLabel: UILabel!
+    @IBOutlet weak var dailyBibleAnimation: UIImageView!
     
     var viewModel = MainViewModel()
-    let sharedLocalStorage = LocalStorage.sharedInstance;
+    let sharedLocalStorage = LocalStorage.sharedInstance
+    
+    var bibleImages: [UIImage] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        bibleImages = createImageArray(total: 6, imagePrefix: "Book")
         retryButton.layer.cornerRadius = 10; // this value vary as per your desire
         retryButton.clipsToBounds = true;
         let _ = viewModel.state.asObservable()
@@ -48,11 +53,13 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         
         switch state {
         case .loading:
+             animate(imageView: dailyBibleAnimation, images: bibleImages)
             progressView.alpha = 1
             progressView.isHidden = false
             
-        case .success(let scriptureData):
+        case .success(let mergeDailyVerseResponse):
             
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             showSuccesView(scriptureData: scriptureData)
             
         case .error:
@@ -86,7 +93,8 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     }
     
     @IBAction func addOrDeleteToFavorites(_ sender: UIButton) {
-        if case .success(let scriptureData) = viewModel.state.value {
+        if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             if(viewModel.addOrDeleteScriptureFromRealm(scriptureData: scriptureData)) {
                 //If the scripture was added to db then change color to red heart
                 heartButton.setImage(UIImage(named: "HeartRed.png"), for: .normal)
@@ -98,7 +106,8 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     }
     
     @IBAction func facebookShareButton(_ sender: Any) {
-        if case .success(let scriptureData) = viewModel.state.value {
+        if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             let content: FBSDKShareLinkContent  = FBSDKShareLinkContent()
             content.contentURL = NSURL(string: scriptureData.share_link!) as URL!
             FBSDKShareDialog.show(from: self, with: content, delegate: nil)
@@ -111,8 +120,8 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     
     @IBAction func twitterShareButton(_ sender: UIButton) {
         
-        if case .success(let scriptureData) = viewModel.state.value {
-            
+        if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
                 let string = "\(scriptureData.tweet!) \(scriptureData.share_link!)"
                 let url = URL(string : string)
@@ -150,9 +159,9 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     }
     
     func sharePressed() {
-        if case .success(let scriptureData) =
-            viewModel.state.value {
+        if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             showMenu(false)
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             let activityVc = UIActivityViewController(activityItems: [scriptureData.share_link ?? ""], applicationActivities: nil)
             activityVc.popoverPresentationController?.sourceView = self.view
             self.present(activityVc, animated: true, completion: nil)
@@ -161,8 +170,8 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     
     func showGooglePlusShare(shareURL: NSURL) {
         
-        if case .success(let scriptureData) = viewModel.state.value {
-            
+        if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             let urlstring = scriptureData.share_link
             
             let shareURL = NSURL(string: urlstring!)
@@ -184,8 +193,20 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         }
     }
     
+    @IBAction func translationButton(_ sender: UIButton) {
+        if(sharedLocalStorage.getBibleVersion() == 1 ) {
+            showAlertTranslation(service: "From the King James Version")
+        } else {
+            showAlertTranslation(service: "Scripture quotations taken from The Holy Bible, New International Version®, NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by Permission of Biblica, Inc.®  All rights reserved worldwide.")
+        }
+        
+    }
+    
     @IBAction func retryAction(_ sender: Any) {
-        progressAnim.isHidden = false
+        dailyBibleAnimation.isHidden = false
+        loadingLabel.isHidden = false
+        animate(imageView: dailyBibleAnimation, images: bibleImages)
+//        progressAnim.isHidden = false
         retryButton.isHidden = true
         viewModel.state.value = .loading
         viewModel.loadDailyVerse()
@@ -199,20 +220,29 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         present(alert, animated: true, completion: nil)
     }
     
+    func showAlertTranslation(service:String) {
+        let alert = UIAlertController(title: service, message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+        
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
     
     //LIFECYCLESMETHODS
     
     override func viewWillAppear(_ animated: Bool) {
         
-        if (sharedLocalStorage.getDidTranslationChange()) {
-            doveView.alpha = 0
-            progressAnim.isHidden = false
-            viewModel.state.value = .loading
-            viewModel.loadDailyVerse()
-            sharedLocalStorage.setDidTranslationChange(false)
-        }
-        if case .success(let scriptureData) = viewModel.state.value {
+        
+        if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
+            let script = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
+            
+            self.verseLabel.text = script.getFirtVerse()
+            self.translationLabel.text = sharedLocalStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
+            let x = "\(script.verses.first?.verse_no ?? 1)".count
+            setFirstCharctersColor(label: self.verseLabel.text!,count: x)
             let realm = try! Realm()
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             
             let date2 = "scripture_date == '\(scriptureData.scripture_date!)'"
             
@@ -243,8 +273,11 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         bannerAdMob.load(request)
     }
     
+    //SETTING UI TO ERROR STATE VIEW
     func showErrorView() {
-        progressAnim.isHidden = true
+        dailyBibleAnimation.isHidden = true
+        loadingLabel.isHidden = true
+
         UIView.animate(withDuration: 0.4
             , animations: {
                 self.retryButton.alpha = 1
@@ -254,6 +287,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         showAlert(service: "Internet")
     }
     
+    //SETTING UI FIELDS
     func showSuccesView(scriptureData: ScriptureData) {
         UIView.animate(withDuration: 0.3
             , animations: {
@@ -261,6 +295,8 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         }, completion: { completion in
             self.retryButton.isHidden = true
         })
+        
+        self.translationLabel.text = sharedLocalStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
         
         let realm = try! Realm()
         
@@ -278,12 +314,15 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             self.progressView.isHidden = true
         })
         
-        verseLabel.text = scriptureData.verses.first?.verse_text
+        verseLabel.text = scriptureData.getFirtVerse()
         if let bookName = scriptureData.book_name, let span = scriptureData.span {
             bookLabel.text = "\(bookName) \(span)"
         } else {
             bookLabel.text = ""
         }
+        
+        let x = "\(scriptureData.verses.first?.verse_no ?? 1)".count
+        setFirstCharctersColor(label: scriptureData.getFirtVerse(),count: x)
         
         UIView.animate(withDuration: 5.0, animations: {
             self.doveView.alpha = 0.3
@@ -302,6 +341,38 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         let string = formatter2.string(from: date!)
         
         dateLabel.text = string
+    }
+    
+    
+    //LOADING ANIMATION
+    func createImageArray(total: Int, imagePrefix: String) -> [UIImage] {
+        
+        var imageArray: [UIImage] = []
+        
+        for imageCount in 1..<total {
+            let imageName = "\(imagePrefix)\(imageCount).png"
+            let image = UIImage(named: imageName)!
+            
+            imageArray.append(image)
+        }
+        return imageArray
+    }
+    
+    //LOADING ANIMATION
+    func animate(imageView: UIImageView, images: [UIImage]) {
+        imageView.animationImages = images
+        imageView.animationDuration = 1.0
+        imageView.animationRepeatCount = 6
+        imageView.startAnimating()
+    }
+    
+    //CHANGE VERSE NUMBER COLOR
+    func setFirstCharctersColor(label : String, count : Int){
+        let range = NSRange(location:0,length:count)
+        let attributedString = NSMutableAttributedString(string: label)
+        
+        attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor.blue, range: range)
+        verseLabel.attributedText = attributedString
     }
     
 }

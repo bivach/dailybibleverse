@@ -23,6 +23,9 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var verseLabel: UILabel!
     @IBOutlet weak var doveView: UIImageView!
+    @IBOutlet weak var translationLabel: UILabel!
+    
+    let localStorage = LocalStorage.sharedInstance
     //    @IBOutlet weak var dateLabel: UILabel!
     //    @IBOutlet weak var verseLabel: UILabel!
     //    @IBOutlet weak var bookLabel: UILabel!
@@ -30,16 +33,19 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     //    @IBOutlet weak var menuView: UIView!
     //    @IBOutlet weak var doveView: UIImageView!
     //    @IBOutlet weak var heartButton: UIButton!
-
+    
     
     @IBAction func onBack(_ sender: Any) {
-         dismiss(animated: true, completion: nil)
+//         dismiss(animated: true, completion: nil)
+        self.navigationController?.popViewController(animated: true)
     }
     
     public var realmFavorite : ScriptureRealm?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
         
         bookLabel.text = "\(realmFavorite!["book_name"]!) \(realmFavorite!["span"]!)"
         
@@ -67,14 +73,13 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         bannerAdMob.load(request)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        translationLabel.text = localStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
+        verseLabel.text = localStorage.getBibleVersion() == 1 ? "\(realmFavorite!["verseKJV"]!)" : "\(realmFavorite!["verseNIV"]!)"
+    }
+    
     @IBAction func heartButton(_ sender: Any) {
-        if(addOrDeleteScriptureFromRealm(scriptureData: realmFavorite!)) {
-            //If the scripture was added to db then change color to red heart
-            heartButton.setImage(UIImage(named: "HeartRed.png"), for: .normal)
-        } else {
-            //Else the scripture was removed from db then change color to alpha heart
-            heartButton.setImage(UIImage(named: "Heart.png"), for: .normal)
-        }
+        addOrDeleteScriptureFromRealm(scriptureData: realmFavorite!)
     }
     
     @IBAction func facebookShareButton(_ sender: UIButton) {
@@ -132,23 +137,51 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     }
     
     
-    func addOrDeleteScriptureFromRealm(scriptureData : ScriptureRealm) -> Bool {
-        
+    func addOrDeleteScriptureFromRealm(scriptureData : ScriptureRealm) {
         let realm = try! Realm()
         let scripts =  realm.objects(ScriptureRealm.self).filter("scripture_date == '\(realmFavorite!["scripture_date"]!)'")
-        
-        if (scripts.count > 0) {
-            try! realm.write {
-                realm.delete(scripts.first!)
-                dismiss(animated: true, completion: nil)
+        let alert = UIAlertController(title: "Are you sure that you want to delete it?", message: "", preferredStyle: .actionSheet)
+        let actionOne = UIAlertAction(title: "Yes", style: .default, handler: { action in
+            if (scripts.count > 0) {
+                try! realm.write {
+                    realm.delete(scripts.first!)
+                }
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                
             }
-            return false
-        } else {
-            addScriptureToRealm()
-            return true
-        }
+            
+        });
+        let action = UIAlertAction(title: "No", style: .cancel, handler: nil)
+        alert.addAction(actionOne)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
         
     }
+    
+//    func showAlertOfdeletingFavorite(service:String) {
+//
+//        let realm = try! Realm()
+//        let scripts =  realm.objects(ScriptureRealm.self).filter("scripture_date == '\(realmFavorite!["scripture_date"]!)'")
+//        let alert = UIAlertController(title: "Error", message: "You are not connected to \(service)", preferredStyle: .alert)
+//        let action = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+//        alert.addAction(UIAlertAction(title: "Are", style: .default, handler: { action in
+//            if (scripts.count > 0) {
+//                try! realm.write {
+//                    realm.delete(scripts.first!)
+//                }
+//                self.navigationController?.popViewController(animated: true)
+//                return false
+//            } else {
+//                addScriptureToRealm()
+//                return true
+//            }
+//
+//        }));
+//
+//        alert.addAction(action)
+//        present(alert, animated: true, completion: nil)
+//    }
     
     func addScriptureToRealm() {
         
@@ -157,6 +190,29 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
             try! realm.write {
                 realm.add(realmFavorite!,update: true)
             }
+    }
+    @IBAction func showTranslationAlert(_ sender: UIButton) {
+        if(localStorage.getBibleVersion() == 1 ) {
+            showAlertTranslation(service: "From the King James Version")
+        } else {
+            showAlertTranslation(service: "Scripture quotations taken from The Holy Bible, New International Version®, NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by Permission of Biblica, Inc.®  All rights reserved worldwide.")
+        }
+    }
+    
+    func showAlertTranslation(service:String) {
+        let alert = UIAlertController(title: service, message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+        
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func setFirstCharctersColor(label : String, count : Int){
+        let range = NSRange(location:0,length:count)
+        let attributedString = NSMutableAttributedString(string: label)
+        
+        attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor.blue, range: range)
+        verseLabel.attributedText = attributedString
     }
     
     

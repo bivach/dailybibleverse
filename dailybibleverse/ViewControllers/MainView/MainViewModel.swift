@@ -15,12 +15,13 @@ import RealmSwift
 class MainViewModel: NSObject {
     
     // MARK: - StateViewModel State
+    let sharedLocalStorage = LocalStorage.sharedInstance;
     
     
     enum State {
         case loading
         case error
-        case success(ScriptureData)
+        case success(MergeDailyVerseResponse)
     }
     
     var state: Variable<State> = Variable(.loading)
@@ -32,14 +33,14 @@ class MainViewModel: NSObject {
     var onChangeState: (MainViewModel.State) -> Void = { (state) in }
     
     func loadDailyVerse() {
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let result = formatter.string(from: date)
-        dailyBibleVerseStore.getDailyVerse(result: result)
+//        let date = Date()
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy-MM-dd"
+//        let result = formatter.string(from: date)
+        dailyBibleVerseStore.getDailyVerse()
             .observeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak self] scriptureData in
-                self?.state.value = .success(scriptureData)
+            .subscribe(onNext: { [weak self] mergeDailyVerseResponse in
+                self?.state.value = .success(mergeDailyVerseResponse)
                 }, onError: { error in
                     self.state.value = .error
                     print(error.localizedDescription)
@@ -70,7 +71,10 @@ class MainViewModel: NSObject {
     }
     
     func addScriptureToRealm() {
-        if case .success(let scriptureData) = state.value {
+        if case .success(let mergeDailyVerseResponse) = state.value {
+            
+            let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
+            
             let favorite = ScriptureRealm()
             favorite.book_id = scriptureData.book_id
             favorite.book_name = scriptureData.book_name
@@ -83,7 +87,9 @@ class MainViewModel: NSObject {
             favorite.verse_end = scriptureData.verse_end
             favorite.verse_start = scriptureData.verse_start
             favorite.verses = scriptureData.verses.first?.verse_text
-            favorite.verse_number = scriptureData.verses.first?.verse_no
+            
+            favorite.verseNIV = mergeDailyVerseResponse.getScriptureDataNIV().getFirtVerse()
+            favorite.verseKJV = mergeDailyVerseResponse.getScriptureDataKJV().getFirtVerse()
             
             let realm = try! Realm()
             
