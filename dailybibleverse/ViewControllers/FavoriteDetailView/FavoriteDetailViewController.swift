@@ -27,14 +27,6 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     @IBOutlet weak var menuView: UIView!
     
     let localStorage = LocalStorage.sharedInstance
-    //    @IBOutlet weak var dateLabel: UILabel!
-    //    @IBOutlet weak var verseLabel: UILabel!
-    //    @IBOutlet weak var bookLabel: UILabel!
-    //    @IBOutlet weak var progressView: UIView!
-    //    @IBOutlet weak var menuView: UIView!
-    //    @IBOutlet weak var doveView: UIImageView!
-    //    @IBOutlet weak var heartButton: UIButton!
-    
     
     @IBAction func onBack(_ sender: Any) {
 //         dismiss(animated: true, completion: nil)
@@ -59,7 +51,6 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         let string = formatter2.string(from: date!)
         
         dateLabel.text = string
-        verseLabel.text  = realmFavorite!["verses"]! as? String
         
         //Request
         let request = GADRequest()
@@ -77,6 +68,13 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     override func viewWillAppear(_ animated: Bool) {
         translationLabel.text = localStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
         verseLabel.text = localStorage.getBibleVersion() == 1 ? "\(realmFavorite!["verseKJV"]!)" : "\(realmFavorite!["verseNIV"]!)"
+        
+        let realmList = realmFavorite!["versesListNIV"]! as! List<VerseRealm>
+        let first = realmList.first!
+        let number = first["verse_no"]!
+        
+        let verse_noCount = "\(number)".count
+        setFirstCharctersColor(label: verseLabel.text!, count: verse_noCount)
     }
 
     func showMenu(_ show: Bool) {
@@ -132,15 +130,16 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     
     @IBAction func twitterShareButton(_ sender: Any) {
         if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
-            let string = "\(realmFavorite!["tweet"]!) \(realmFavorite!["share_link"]!)"
+            let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
+            let string = "\(tweet) \(realmFavorite!["share_link"]!)"
             let url = URL(string : string)
             let post = SLComposeViewController(forServiceType: SLServiceTypeTwitter)!
             post.setInitialText("Verse of the day")
             post.add(url)
             self.present(post, animated: true, completion: nil)
         } else {
-            
-            let urlstring = "\(realmFavorite!["tweet"]!) \(realmFavorite!["share_link"]!)"
+            let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
+            let urlstring = "\(tweet) \(realmFavorite!["share_link"]!)"
             
             let urlComponents = NSURLComponents(string: "https://twitter.com/intent/tweet")
             
@@ -188,39 +187,9 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         
     }
     
-//    func showAlertOfdeletingFavorite(service:String) {
-//
-//        let realm = try! Realm()
-//        let scripts =  realm.objects(ScriptureRealm.self).filter("scripture_date == '\(realmFavorite!["scripture_date"]!)'")
-//        let alert = UIAlertController(title: "Error", message: "You are not connected to \(service)", preferredStyle: .alert)
-//        let action = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
-//        alert.addAction(UIAlertAction(title: "Are", style: .default, handler: { action in
-//            if (scripts.count > 0) {
-//                try! realm.write {
-//                    realm.delete(scripts.first!)
-//                }
-//                self.navigationController?.popViewController(animated: true)
-//                return false
-//            } else {
-//                addScriptureToRealm()
-//                return true
-//            }
-//
-//        }));
-//
-//        alert.addAction(action)
-//        present(alert, animated: true, completion: nil)
-//    }
-    
-    func addScriptureToRealm() {
-        
-            let realm = try! Realm()
-            
-            try! realm.write {
-                realm.add(realmFavorite!,update: true)
-            }
+    @IBAction func settingPressed(_ sender: UIButton) {
+        showMenu(false)
     }
-    
     @IBAction func showTranslationAlert(_ sender: UIButton) {
         if(localStorage.getBibleVersion() == 1 ) {
             showAlertTranslation(service: "From the King James Version")
@@ -240,8 +209,9 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     func setFirstCharctersColor(label : String, count : Int){
         let range = NSRange(location:0,length:count)
         let attributedString = NSMutableAttributedString(string: label)
+        let lightBlue = UIColor(red: 0.0, green: 122.0/255.0, blue: 1.0, alpha: 1)
         
-        attributedString.addAttribute(NSForegroundColorAttributeName, value: UIColor.blue, range: range)
+        attributedString.addAttribute(NSForegroundColorAttributeName, value: lightBlue, range: range)
         verseLabel.attributedText = attributedString
     }
     

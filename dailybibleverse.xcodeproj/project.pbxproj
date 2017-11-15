@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		101E5210280D5782F1121CDE /* Pods_dailybibleverse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4C75B80C4C601B3BC6D3F57 /* Pods_dailybibleverse.framework */; };
 		2DDA89561FAF746400CB4F46 /* SlideSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDA89551FAF746400CB4F46 /* SlideSegue.swift */; };
+		EB45E91A1FBB4C8A006F8998 /* VerseRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB45E9191FBB4C8A006F8998 /* VerseRealm.swift */; };
 		EB900B641FAE2CDD0083D814 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB900B631FAE2CDD0083D814 /* AppDelegate.swift */; };
 		EB900B691FAE2CDD0083D814 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EB900B671FAE2CDD0083D814 /* Main.storyboard */; };
 		EB900B6C1FAE2CDD0083D814 /* dailybibleverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EB900B6A1FAE2CDD0083D814 /* dailybibleverse.xcdatamodeld */; };
@@ -39,6 +40,7 @@
 		A4C75B80C4C601B3BC6D3F57 /* Pods_dailybibleverse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_dailybibleverse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0C07852C18322BC9AC8FC90 /* Pods-dailybibleverse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dailybibleverse.release.xcconfig"; path = "Pods/Target Support Files/Pods-dailybibleverse/Pods-dailybibleverse.release.xcconfig"; sourceTree = "<group>"; };
 		E3365C767C724D78E2006339 /* Pods-dailybibleverse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-dailybibleverse.debug.xcconfig"; path = "Pods/Target Support Files/Pods-dailybibleverse/Pods-dailybibleverse.debug.xcconfig"; sourceTree = "<group>"; };
+		EB45E9191FBB4C8A006F8998 /* VerseRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerseRealm.swift; sourceTree = "<group>"; };
 		EB900B601FAE2CDD0083D814 /* dailybibleverse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dailybibleverse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB900B631FAE2CDD0083D814 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EB900B681FAE2CDD0083D814 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -178,6 +180,7 @@
 				EB900B861FAE2F100083D814 /* ScriptureData.swift */,
 				EB900B871FAE2F100083D814 /* ScriptureRealm.swift */,
 				EB900B881FAE2F100083D814 /* Verse.swift */,
+				EB45E9191FBB4C8A006F8998 /* VerseRealm.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -372,6 +375,7 @@
 				EB900B971FAE368F0083D814 /* Router.swift in Sources */,
 				EB900BA91FAE3B320083D814 /* FavoriteDetailViewController.swift in Sources */,
 				EB900BA71FAE378F0083D814 /* FavoriteVerseCell.swift in Sources */,
+				EB45E91A1FBB4C8A006F8998 /* VerseRealm.swift in Sources */,
 				EB900B8A1FAE2F100083D814 /* ScriptureData.swift in Sources */,
 				EB900B951FAE368F0083D814 /* DailyBibleVerseStore.swift in Sources */,
 				EB900B641FAE2CDD0083D814 /* AppDelegate.swift in Sources */,

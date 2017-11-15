@@ -1061,6 +1061,7 @@
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qMt-Op-nEX">
                                                         <rect key="frame" x="0.0" y="0.0" width="240" height="63"/>
                                                         <connections>
+                                                            <action selector="settingPressed:" destination="N7H-WJ-Esg" eventType="touchUpInside" id="vEl-03-ZBA"/>
                                                             <action selector="settingsTouch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="lSO-Xp-xk3"/>
                                                             <segue destination="jC2-jJ-tTz" kind="presentation" id="EAU-cW-Bqh"/>
                                                         </connections>
