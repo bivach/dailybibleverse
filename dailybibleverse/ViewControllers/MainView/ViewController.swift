@@ -123,10 +123,10 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
-                let string = "\(scriptureData.tweet!) \(scriptureData.share_link!)"
+                let string = "\(scriptureData.share_link!)"
                 let url = URL(string : string)
                 let post = SLComposeViewController(forServiceType: SLServiceTypeTwitter)!
-                post.setInitialText("Verse of the day")
+                post.setInitialText("\(scriptureData.tweet!)")
                 post.add(url)
                 self.present(post, animated: true, completion: nil)
             } else {
@@ -162,7 +162,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             showMenu(false)
             let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
-            let activityVc = UIActivityViewController(activityItems: [scriptureData.share_link ?? ""], applicationActivities: nil)
+            let activityVc = UIActivityViewController(activityItems: [scriptureData.share_link!], applicationActivities: nil)
             activityVc.popoverPresentationController?.sourceView = self.view
             self.present(activityVc, animated: true, completion: nil)
         }

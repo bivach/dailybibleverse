@@ -131,10 +131,10 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     @IBAction func twitterShareButton(_ sender: Any) {
         if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
             let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
-            let string = "\(tweet) \(realmFavorite!["share_link"]!)"
+            let string = "\(realmFavorite!["share_link"]!)"
             let url = URL(string : string)
             let post = SLComposeViewController(forServiceType: SLServiceTypeTwitter)!
-            post.setInitialText("Verse of the day")
+            post.setInitialText(tweet as! String)
             post.add(url)
             self.present(post, animated: true, completion: nil)
         } else {
