@@ -364,7 +364,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     func animate(imageView: UIImageView, images: [UIImage]) {
         imageView.animationImages = images
         imageView.animationDuration = 1.0
-        imageView.animationRepeatCount = 6
+        imageView.animationRepeatCount = 10
         imageView.startAnimating()
     }
     

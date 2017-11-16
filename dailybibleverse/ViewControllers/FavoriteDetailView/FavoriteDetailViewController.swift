@@ -38,20 +38,24 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        UIView.animate(withDuration: 5.0, animations: {
+            self.doveView.alpha = 0.25
+        }, completion: { completion in
+            self.doveView.isHidden = false
+        })
         
         bookLabel.text = "\(realmFavorite!["book_name"]!) \(realmFavorite!["span"]!)"
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        let date = formatter.date(from: realmFavorite!["scripture_date"] as! String)
+        let date = formatter.date(from: realmFavorite!["scripture_date"]! as! String)
+        
         
         let formatter2 = DateFormatter()
-        formatter2.dateFormat = "yyyy/MM/dd"
+        formatter2.dateFormat = "EEEE, MMMM dd, yyyy"
         let string = formatter2.string(from: date!)
         
-        dateLabel.text = string
-        
+        dateLabel.text = string        
         //Request
         let request = GADRequest()
         request.testDevices = [kGADSimulatorID]
@@ -75,6 +79,7 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         
         let verse_noCount = "\(number)".count
         setFirstCharctersColor(label: verseLabel.text!, count: verse_noCount)
+        underlineTranslationLabel()
     }
 
     func showMenu(_ show: Bool) {
@@ -213,6 +218,12 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         
         attributedString.addAttribute(NSForegroundColorAttributeName, value: lightBlue, range: range)
         verseLabel.attributedText = attributedString
+    }
+    
+    func underlineTranslationLabel() {
+        let attributedString = NSMutableAttributedString(string: translationLabel.text!)
+        attributedString.addAttribute(NSUnderlineStyleAttributeName, value: NSUnderlineStyle.styleSingle.rawValue, range: NSRange(location: 0, length: attributedString.length - 1))
+        translationLabel.attributedText = attributedString
     }
     
     
