@@ -653,6 +653,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="80" id="1tT-bH-ZWr"/>
                                         </constraints>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
                                         <state key="normal" title="OK"/>
                                         <connections>
                                             <action selector="setTime:" destination="jC2-jJ-tTz" eventType="touchUpInside" id="qKb-vK-Yce"/>
