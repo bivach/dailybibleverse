@@ -10,15 +10,50 @@ import UIKit
 import CoreData
 import GoogleMobileAds
 import FBSDKCoreKit
+import UserNotifications
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
+    
+    let sharedLocalStorage = LocalStorage.sharedInstance
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound]) { (allawed, error) in
+            if(allawed) {
+                //SET DEFAULT TIME IF USER ACCEPT NOTIFICATION 08:00
+                self.sharedLocalStorage.saveHasReminder(true)
+                let content = UNMutableNotificationContent()
+                content.title = "Daily Bible Verse"
+                content.body = "Your Daily Bible Verse is Ready"
+                let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())
+                
+                let userCalendar = Calendar.current
+                var components = userCalendar.dateComponents([.hour, .minute], from: tomorrow!)
+                
+                components.hour = 08
+                components.minute = 00
+                
+                
+                let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+                let request = UNNotificationRequest(identifier: "test", content: content, trigger: trigger)
+                
+                UNUserNotificationCenter.current().add(request) { (error) in
+                    if ((error) != nil){
+                        print("Error \(String(describing: error))")
+                    }
+                }
+            } else{
+                self.sharedLocalStorage.saveHasReminder(false)
+            }
+            
+        }
+        
+        UNUserNotificationCenter.current().delegate = self
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
          GADMobileAds.configure(withApplicationID: "ca-app-pub-0219081932956726/4282096506")
@@ -31,6 +66,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                          sourceApplication: sourceApplication,
                                                          annotation: annotation)
     }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler(.alert)
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response:UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void)
+    {
+        print("Handle push from background or closed")
+        // if you set a member variable in didReceiveRemoteNotification, you will know if this is from closed or background
+        print("\(response.notification.request.content.userInfo)")
+    }
+    
     
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

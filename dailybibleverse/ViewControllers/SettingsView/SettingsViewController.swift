@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import UserNotifications
 
 class SettingsViewController : UIViewController {
 
@@ -23,6 +24,14 @@ class SettingsViewController : UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat =  "HH:mm"
+        
+        let date = dateFormatter.date(from: "08:00")
+        
+        pickerView.date = date!
+    
         hasReminderSwitch.isOn = localStorage.getHasReminder()
         if (localStorage.getBibleVersion() == 1) {
             kjvTranslation.image = UIImage(named : "ic_radio_button_checked")
@@ -39,6 +48,20 @@ class SettingsViewController : UIViewController {
 
     @IBAction func enableTimeReminder(_ sender: UISwitch) {
         localStorage.saveHasReminder(sender.isOn)
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound]) { (allawed, error) in
+            if(allawed) {
+                if !sender.isOn {
+                    
+                }
+            } else {
+                if sender.isOn {
+                    if let appSettings = URL(string: UIApplicationOpenSettingsURLString) {
+                        UIApplication.shared.open(appSettings,options: [:], completionHandler:nil)
+                    }
+                }
+                
+            }
+        }
     }
 
     @IBAction func openTimePicker(_ sender: UISwitch) {
@@ -46,6 +69,22 @@ class SettingsViewController : UIViewController {
     }
 
     @IBAction func setTime(_ sender: UIButton) {
+
+        //NO SE si funciona esto poruqe deberia reemplazar la que esta por default pero no encontre nada para haerlo
+        pickerView.datePickerMode = UIDatePickerMode.date
+        let selectedDate=pickerView.timeZone
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Daily Bible Verse"
+        content.body = "Your Daily Bible Verse is Ready"
+        
+        let componentsFromDate = Calendar.current.dateComponents(in: selectedDate!, from: Date())
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: componentsFromDate, repeats: true)
+        let request = UNNotificationRequest(identifier: "test", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+        
         showTimePickerView(false)
     }
 
