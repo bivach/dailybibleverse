@@ -255,8 +255,8 @@
 				TargetAttributes = {
 					EB900B5F1FAE2CDD0083D814 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = DS5CB4K574;
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = T9C4B3C2E2;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -523,11 +523,15 @@
 			baseConfigurationReference = E3365C767C724D78E2006339 /* Pods-dailybibleverse.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = DS5CB4K574;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = T9C4B3C2E2;
 				INFOPLIST_FILE = dailybibleverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.adepture.dailybibleverse;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adepture.dailybibleverses;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "e1e0c367-afdc-4265-b169-1c7b74de0801";
+				PROVISIONING_PROFILE_SPECIFIER = WildcardProvisioningProfile;
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -537,11 +541,15 @@
 			baseConfigurationReference = B0C07852C18322BC9AC8FC90 /* Pods-dailybibleverse.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = DS5CB4K574;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = T9C4B3C2E2;
 				INFOPLIST_FILE = dailybibleverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.adepture.dailybibleverse;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adepture.dailybibleverses;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "e1e0c367-afdc-4265-b169-1c7b74de0801";
+				PROVISIONING_PROFILE_SPECIFIER = WildcardProvisioningProfile;
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
