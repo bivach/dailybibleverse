@@ -533,6 +533,7 @@
 				PROVISIONING_PROFILE = "e1e0c367-afdc-4265-b169-1c7b74de0801";
 				PROVISIONING_PROFILE_SPECIFIER = WildcardProvisioningProfile;
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -551,6 +552,7 @@
 				PROVISIONING_PROFILE = "e1e0c367-afdc-4265-b169-1c7b74de0801";
 				PROVISIONING_PROFILE_SPECIFIER = WildcardProvisioningProfile;
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
