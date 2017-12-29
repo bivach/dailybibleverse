@@ -3,13 +3,13 @@
     {
       "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "Icon-Spotlight-40.png",
+      "filename" : "Icon-61.png",
       "scale" : "2x"
     },
     {
       "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "Icon-60.png",
+      "filename" : "Icon-60@2x-1.png",
       "scale" : "3x"
     },
     {
@@ -51,7 +51,7 @@
     {
       "size" : "1024x1024",
       "idiom" : "ios-marketing",
-      "filename" : "iTunesArtwork.png",
+      "filename" : "iTunesArtwork@2x.png",
       "scale" : "1x"
     }
   ],

@@ -20,52 +20,11 @@ class LocalStorage {
     private let hasReminderKey = "com.dailybible.hasReminder"
     private let favoritesKey = "com.dailybible.favorites"
     private let didTranslationChange = "com.dailybible.didTranslationChange"
-
-//    private let coreDataHelper = CoreDataStack.sharedInstance
+    private let firstTimeLauchingApp = "com.dailybible.firstTimeLauchingApp"
 
     private var userDefaults: UserDefaults { return UserDefaults.standard }
 
-    // MARK: - Public Methods
-
-//    // MARK: - Core Data
-//
-//    func newObject<T: NSManagedObject>() -> T {
-//        let typeString = "\(T.self)"
-//        let newObject =  coreDataHelper.newObjectWithType(typeString) as! T
-//        return newObject
-//    }
-//
-//    func storeObject(_ object: NSManagedObject) {
-//        coreDataHelper.saveContext()
-//    }
-//
-//    /// let array: [Instrument] = storedObjets()
-//    func storedObjects<T: NSManagedObject>() -> [T] {
-//        let typeString = "\(T.self)"
-//        let objects: [T] = coreDataHelper.objectsWithType(typeString)
-//        return objects
-//    }
-//
-//    func deleteObject(_ object: NSManagedObject) {
-//        coreDataHelper.deleteObject(object)
-//    }
-
-    // MARK: - Favorites
-
-    func getFavorites() -> JSON? {
-        if let configJson = userDefaults.string(forKey: favoritesKey) {
-            return JSON(parseJSON: configJson)
-        }
-        return nil
-    }
-
-    func saveFavorites(_ favoriresJSON: JSON) {
-        if let favoriresString = favoriresJSON.rawString([:]) {
-            userDefaults.set(favoriresString, forKey: favoritesKey)
-            userDefaults.synchronize()
-        }
-    }
-
+    
     // MARK: - bibleVersionKey
 
     func saveBibleVersion(_ bibleVersion: Int) {
@@ -98,4 +57,16 @@ class LocalStorage {
     func getDidTranslationChange() -> Bool {
         return userDefaults.object(forKey: didTranslationChange) as? Bool ?? false
     }
+    
+    //MARK: IsFirstTimeUserLaunchingApp
+    
+    func saveFirstTimeLaunchingApp(_ firstTime: Bool) {
+        userDefaults.set(firstTime, forKey: firstTimeLauchingApp)
+        userDefaults.synchronize()
+    }
+    
+    func getFirstTimeLaunchingApp() -> Bool {
+        return userDefaults.object(forKey: firstTimeLauchingApp) as? Bool ?? true
+    }
+    
 }

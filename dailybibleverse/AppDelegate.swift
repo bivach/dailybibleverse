@@ -22,39 +22,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound]) { (allawed, error) in
-            if(allawed) {
-                //SET DEFAULT TIME IF USER ACCEPT NOTIFICATION 08:00
-                self.sharedLocalStorage.saveHasReminder(true)
-                let content = UNMutableNotificationContent()
-                content.title = "Daily Bible Verse"
-                content.body = "Your Daily Bible Verse is Ready"
-                let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())
-                
-                let userCalendar = Calendar.current
-                var components = userCalendar.dateComponents([.hour, .minute], from: tomorrow!)
-                
-                components.hour = 08
-                components.minute = 00
-                
-                
-                let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-                let request = UNNotificationRequest(identifier: "test", content: content, trigger: trigger)
-                
-                UNUserNotificationCenter.current().add(request) { (error) in
-                    if ((error) != nil){
-                        print("Error \(String(describing: error))")
+        if (sharedLocalStorage.getFirstTimeLaunchingApp()) {
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.sound]) { (allawed, error) in
+                if(allawed) {
+                    //SET DEFAULT TIME IF USER ACCEPT NOTIFICATION 08:00
+                    self.sharedLocalStorage.saveHasReminder(true)
+                    let content = UNMutableNotificationContent()
+                    content.title = "Daily Bible Verse"
+                    content.body = "Your Daily Bible Verse is Ready"
+                    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())
+                    
+                    let userCalendar = Calendar.current
+                    var components = userCalendar.dateComponents([.hour, .minute], from: tomorrow!)
+                    
+                    components.hour = 08
+                    components.minute = 00
+                    
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+                    let request = UNNotificationRequest(identifier: "test", content: content, trigger: trigger)
+                    
+                    UNUserNotificationCenter.current().add(request) { (error) in
+                        if ((error) != nil){
+                            print("Error \(String(describing: error))")
+                        }
                     }
+                } else{
+                    self.sharedLocalStorage.saveHasReminder(false)
                 }
-            } else{
-                self.sharedLocalStorage.saveHasReminder(false)
+                
             }
-            
         }
         
         UNUserNotificationCenter.current().delegate = self
-        
+        sharedLocalStorage.saveFirstTimeLaunchingApp(false)
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
          GADMobileAds.configure(withApplicationID: "ca-app-pub-0219081932956726/4282096506")
         return true
