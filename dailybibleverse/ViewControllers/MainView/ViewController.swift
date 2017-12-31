@@ -31,6 +31,10 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     
     var viewModel = MainViewModel()
     let sharedLocalStorage = LocalStorage.sharedInstance
+
+    var translationText: String {
+        return sharedLocalStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Copyright biblica, Inc.®"
+    }
     
     var bibleImages: [UIImage] = []
     
@@ -235,12 +239,18 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             let script = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
-            
-            self.verseLabel.text = script.getFirtVerse()
-            self.translationLabel.text = sharedLocalStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
-            underlineTranslationLabel()
-            let x = "\(script.verses.first?.verse_no ?? 1)".count
-            setFirstCharctersColor(label: self.verseLabel.text!,count: x)
+
+            self.translationLabel.attributedText = underline(translationText)
+
+            let allVersesString = NSMutableAttributedString(string: "")
+            for verse in script.verses {
+                let x = "\(verse.verse_no ?? 1)".count
+                let verseString = changeColor(text: verse.verse_text!, forFirstCharacterCount: x)
+                allVersesString.append(verseString)
+                allVersesString.append(NSAttributedString(string: "\n"))
+            }
+            self.verseLabel.attributedText = allVersesString
+
             let realm = try! Realm()
             let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             
@@ -296,9 +306,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             self.retryButton.isHidden = true
         })
         
-        self.translationLabel.text = sharedLocalStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
-        
-        underlineTranslationLabel()
+        self.translationLabel.attributedText = underline(translationText)
         
         let realm = try! Realm()
         
@@ -316,15 +324,20 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             self.progressView.isHidden = true
         })
         
-        verseLabel.text = scriptureData.getFirtVerse()
         if let bookName = scriptureData.book_name, let span = scriptureData.span {
             bookLabel.text = "\(bookName) \(span)"
         } else {
             bookLabel.text = ""
         }
         
-        let x = "\(scriptureData.verses.first?.verse_no ?? 1)".count
-        setFirstCharctersColor(label: scriptureData.getFirtVerse(),count: x)
+        let allVersesString = NSMutableAttributedString(string: "")
+        for verse in scriptureData.verses {
+            let x = "\(verse.verse_no ?? 1)".count
+            let verseString = changeColor(text: verse.verse_text!, forFirstCharacterCount: x)
+            allVersesString.append(verseString)
+            allVersesString.append(NSAttributedString(string: "\n"))
+        }
+        self.verseLabel.attributedText = allVersesString
         
         UIView.animate(withDuration: 5.0, animations: {
             self.doveView.alpha = 0.3
@@ -361,6 +374,7 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     }
     
     //LOADING ANIMATION
+
     func animate(imageView: UIImageView, images: [UIImage]) {
         imageView.animationImages = images
         imageView.animationDuration = 1.0
@@ -369,20 +383,20 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
     }
     
     //CHANGE VERSE NUMBER COLOR
-    func setFirstCharctersColor(label : String, count : Int){
-        let range = NSRange(location:0,length:count)
+
+    func changeColor(text: String, forFirstCharacterCount count: Int) -> NSAttributedString {
+        let range = NSRange(location:0, length:count)
         let lightBlue = UIColor(red: 0.0, green: 122.0/255.0, blue: 1.0, alpha: 1)
-        let attributedString = NSMutableAttributedString(string: label)
+        let attributedString = NSMutableAttributedString(string: text)
         
         attributedString.addAttribute(NSForegroundColorAttributeName, value: lightBlue, range: range)
-        verseLabel.attributedText = attributedString
+        return attributedString
     }
     
-    func underlineTranslationLabel() {
-        let attributedString = NSMutableAttributedString(string: translationLabel.text!)
+    func underline(_ string: String) -> NSAttributedString {
+        let attributedString = NSMutableAttributedString(string: string)
         attributedString.addAttribute(NSUnderlineStyleAttributeName, value: NSUnderlineStyle.styleSingle.rawValue, range: NSRange(location: 0, length: attributedString.length - 1))
-        translationLabel.attributedText = attributedString
+        return attributedString
     }
-    
 }
 
