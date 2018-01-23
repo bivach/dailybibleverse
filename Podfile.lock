@@ -1,28 +1,28 @@
 PODS:
-  - Alamofire (4.5.1)
-  - Bolts (1.8.4):
-    - Bolts/AppLinks (= 1.8.4)
-    - Bolts/Tasks (= 1.8.4)
-  - Bolts/AppLinks (1.8.4):
+  - Alamofire (4.6.0)
+  - Bolts (1.9.0):
+    - Bolts/AppLinks (= 1.9.0)
+    - Bolts/Tasks (= 1.9.0)
+  - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
-  - Bolts/Tasks (1.8.4)
-  - FBSDKCoreKit (4.27.1):
+  - Bolts/Tasks (1.9.0)
+  - FBSDKCoreKit (4.29.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.27.1):
+  - FBSDKLoginKit (4.29.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.27.1):
+  - FBSDKShareKit (4.29.0):
     - FBSDKCoreKit
-  - Google-Mobile-Ads-SDK (7.25.0)
-  - Realm (3.0.1):
-    - Realm/Headers (= 3.0.1)
-  - Realm/Headers (3.0.1)
-  - RealmSwift (3.0.1):
-    - Realm (= 3.0.1)
-  - RxSwift (3.5.0)
+  - Google-Mobile-Ads-SDK (7.27.0)
+  - Realm (3.1.0):
+    - Realm/Headers (= 3.1.0)
+  - Realm/Headers (3.1.0)
+  - RealmSwift (3.1.0):
+    - Realm (= 3.1.0)
+  - RxSwift (3.6.1)
   - SwiftyJSON (3.1.4)
-  - TwitterCore (3.0.2)
-  - TwitterKit (3.2.1):
-    - TwitterCore (>= 3.0.2)
+  - TwitterCore (3.1.0)
+  - TwitterKit (3.3.0):
+    - TwitterCore (>= 3.1.0)
 
 DEPENDENCIES:
   - Alamofire (~> 4.2)
@@ -37,18 +37,18 @@ DEPENDENCIES:
   - TwitterKit
 
 SPEC CHECKSUMS:
-  Alamofire: 2d95912bf4c34f164fdfc335872e8c312acaea4a
-  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  FBSDKCoreKit: 03365dad5d790249196ffad8be4f6d8a2d98f932
-  FBSDKLoginKit: 66ff53b73cffd967ab773e32fac39e90a60e6d46
-  FBSDKShareKit: 6a6a0ef9e850c741e4e1d7a7d21335205e997ec1
-  Google-Mobile-Ads-SDK: 113804f266381a30f982ad3c18063d4e0155414f
-  Realm: ba6144c74f835f7497791f6599d63a7755377b83
-  RealmSwift: 7d13b1ac4b6022a13f841e3143e7789c9e40ad0d
-  RxSwift: 18ee9d78b45edb3b0b7e79916b47a116e6dbc842
+  Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
+  FBSDKCoreKit: 6f139173dc63a1deaff4430a55f2fe5bb222d2af
+  FBSDKLoginKit: 56a057ca6822535ea0faa25f57a7c41edb697fd4
+  FBSDKShareKit: 18a2cd118aef11dd657fe7e8b64bae5c719088b2
+  Google-Mobile-Ads-SDK: 83f7f890e638ce8f1debd440ea363338c9f6be3b
+  Realm: 09513d7c054678d65cd02ce09871f805b0d758ac
+  RealmSwift: e868fee9b10e5490ad94b6b6ecd9027944da1824
+  RxSwift: f9de85ea20cd2f7716ee5409fc13523dc638e4e4
   SwiftyJSON: c2842d878f95482ffceec5709abc3d05680c0220
-  TwitterCore: e0420b01e02e7d20e94690e37f43e75de219ab8d
-  TwitterKit: 205ac89824bbfe9e85a16c420d30bb7bcbedac45
+  TwitterCore: 644d59e75abccb26cf0a9050d2c4dea0e5412241
+  TwitterKit: a2e60ddcedbf54091eac6f27685ca7a87681e1d7
 
 PODFILE CHECKSUM: eff4fddb6c71c88918f177ffb0d37dc2a8306a3c
 

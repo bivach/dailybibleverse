@@ -53,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 
             }
         }
-        Twitter.sharedInstance().start(withConsumerKey:"piJYwNpTii8g3eQcbD745XDfj", consumerSecret:"0rLSM41Q8dBUlF8qUxW4D4pMW82kVxdRXGVs1daHn2IdDgcIzg")
+        TWTRTwitter.sharedInstance().start(withConsumerKey:"piJYwNpTii8g3eQcbD745XDfj", consumerSecret:"0rLSM41Q8dBUlF8qUxW4D4pMW82kVxdRXGVs1daHn2IdDgcIzg")
         UNUserNotificationCenter.current().delegate = self
         sharedLocalStorage.saveFirstTimeLaunchingApp(false)
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -80,7 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        return Twitter.sharedInstance().application(app, open: url, options: options)
+        return TWTRTwitter.sharedInstance().application(app, open: url, options: options)
     }
     
     
