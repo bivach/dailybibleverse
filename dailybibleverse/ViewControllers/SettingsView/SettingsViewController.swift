@@ -28,7 +28,7 @@ class SettingsViewController : UIViewController {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat =  "HH:mm"
         
-        let date = dateFormatter.date(from: "08:00")
+        let date = dateFormatter.date(from: localStorage.getTimeReminderKey())
         
         pickerView.date = date!
         pickerView.datePickerMode = .time
@@ -70,12 +70,18 @@ class SettingsViewController : UIViewController {
     }
 
     @IBAction func setTime(_ sender: UIButton) {
+        
+        let componentsFromDate = Calendar.current.dateComponents([.hour, .minute, .second], from: pickerView.date)
+        
+        let components = Calendar.current.dateComponents([.hour, .minute], from: pickerView.date)
+        let hour = "\(components.hour ?? 08):\(components.minute ?? 00)"
+        localStorage.saveTimeReminderKey(hour)
 
         let content = UNMutableNotificationContent()
         content.title = "Daily Bible Verse"
         content.body = "Your Daily Bible Verse is Ready"
         
-        let componentsFromDate = Calendar.current.dateComponents([.hour, .minute, .second], from: pickerView.date)
+        
         let trigger = UNCalendarNotificationTrigger(dateMatching: componentsFromDate, repeats: true)
         let request = UNNotificationRequest(identifier: "dailybibleverse.reminder", content: content, trigger: trigger)
 

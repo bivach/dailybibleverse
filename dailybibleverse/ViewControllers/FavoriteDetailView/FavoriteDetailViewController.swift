@@ -13,7 +13,7 @@ import Social
 import GoogleMobileAds
 import FBSDKShareKit
 import RealmSwift
-
+import TwitterKit
 
 class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SFSafariViewControllerDelegate {
     
@@ -73,13 +73,25 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         translationLabel.text = localStorage.getBibleVersion() == 1 ? "King James version (KJV)" : "NIV® Scripture Cpyright biblica, Inc.®"
         verseLabel.text = localStorage.getBibleVersion() == 1 ? "\(realmFavorite!["verseKJV"]!)" : "\(realmFavorite!["verseNIV"]!)"
         
-        let realmList = realmFavorite!["versesListNIV"]! as! List<VerseRealm>
-        let first = realmList.first!
-        let number = first["verse_no"]!
+        let realmList = localStorage.getBibleVersion() == 1 ? realmFavorite!["versesListKJV"]! as! List<VerseRealm> : realmFavorite!["versesListNIV"]! as! List<VerseRealm>
         
-        let verse_noCount = "\(number)".count
-        setFirstCharctersColor(label: verseLabel.text!, count: verse_noCount)
-        underlineTranslationLabel()
+        self.translationLabel.attributedText = underline(translationLabel.text!)
+        
+        let allVersesString = NSMutableAttributedString(string: "")
+        let size = realmList.count
+        var count = 1
+        for verse in realmList {
+            let x =  "\(verse["verse_no"]!)".count
+            let string = "\(verse["verse_no"]! ) \(verse["verse_text"]!)"
+            let verseString = changeColor(text: string, forFirstCharacterCount: x)
+            allVersesString.append(verseString)
+            if(size != count) {
+                allVersesString.append(NSAttributedString(string: "\n"))
+                allVersesString.append(NSAttributedString(string: "\n"))
+            }
+            count = count + 1
+        }
+        self.verseLabel.attributedText = allVersesString
     }
 
     func showMenu(_ show: Bool) {
@@ -120,7 +132,17 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         
         let urlComponents = NSURLComponents(string: "https://plus.google.com/share")
         
-        urlComponents!.queryItems = [NSURLQueryItem(name: "url", value: shareURL!.absoluteString) as URLQueryItem]
+        let realmList = localStorage.getBibleVersion() == 1 ? realmFavorite!["versesListKJV"]! as! List<VerseRealm> : realmFavorite!["versesListNIV"]! as! List<VerseRealm>
+        
+        let allVersesString = NSMutableAttributedString(string: "")
+        for verse in realmList {
+            let string = "\(verse["verse_no"]! ) \(verse["verse_text"]!)"
+            allVersesString.append(NSAttributedString(string: string))
+            allVersesString.append(NSAttributedString(string: "\n"))
+            allVersesString.append(NSAttributedString(string: "\n"))
+        }
+        
+        urlComponents!.queryItems = [NSURLQueryItem(name: "text", value: "\(realmFavorite!["book_name"]!) \(realmFavorite!["span"]!) \n\(allVersesString.string)") as URLQueryItem,NSURLQueryItem(name: "url", value: shareURL!.absoluteString) as URLQueryItem]
         
         let url = urlComponents!.url!
         
@@ -134,37 +156,44 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     }
     
     @IBAction func twitterShareButton(_ sender: Any) {
-        if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
-            let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
-            let string = "\(realmFavorite!["share_link"]!)"
-            let url = URL(string : string)
-            let post = SLComposeViewController(forServiceType: SLServiceTypeTwitter)!
-            post.setInitialText(tweet as! String)
-            post.add(url)
-            self.present(post, animated: true, completion: nil)
-        } else {
-            let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
-            let urlstring = "\(tweet) \(realmFavorite!["share_link"]!)"
-            
-            let urlComponents = NSURLComponents(string: "https://twitter.com/intent/tweet")
-            
-            urlComponents!.queryItems = [NSURLQueryItem(name: "text", value: urlstring.replacingOccurrences(of: ";", with: "")) as URLQueryItem]
-            
-            let url = urlComponents!.url!
-            
-            if #available(iOS 9.0, *) {
-                let svc = SFSafariViewController(url: url)
-                svc.delegate = self
-                self.present(svc, animated: true, completion: nil)
+        let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
+        let string = "\(realmFavorite!["share_link"]!)"
+        let url = URL(string : string)
+        
+        // Swift
+        let composer = TWTRComposer()
+        
+        composer.setText(tweet as? String)
+        composer.setURL(url)
+        
+        // Called from a UIViewController
+        composer.show(from: self.navigationController!) { (result) in
+            if (result == .done) {
+                print("Successfully composed Tweet")
             } else {
-                debugPrint("Not available")
+                print("Cancelled composing")
             }
         }
     }
 
     func sharePressed() {
         showMenu(false)
-        let activityVc = UIActivityViewController(activityItems: [realmFavorite!.share_link ?? ""], applicationActivities: nil)
+        
+        let realmList = localStorage.getBibleVersion() == 1 ? realmFavorite!["versesListKJV"]! as! List<VerseRealm> : realmFavorite!["versesListNIV"]! as! List<VerseRealm>
+        
+        let allVersesString = NSMutableAttributedString(string: "")
+        for verse in realmList {
+            let string = "\(verse["verse_no"]! ) \(verse["verse_text"]!)"
+            allVersesString.append(NSAttributedString(string: string))
+            allVersesString.append(NSAttributedString(string: "\n"))
+            allVersesString.append(NSAttributedString(string: "\n"))
+        }
+        
+        let stringToShare = "\(realmFavorite!["book_name"]!) \(realmFavorite!["span"]!)\n\(allVersesString.string)\n\(realmFavorite!["share_link"]!)"
+        
+        let text = [stringToShare]
+        
+        let activityVc = UIActivityViewController(activityItems: text, applicationActivities: nil)
         activityVc.popoverPresentationController?.sourceView = self.view
         self.present(activityVc, animated: true, completion: nil)
     }
@@ -211,19 +240,21 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
         present(alert, animated: true, completion: nil)
     }
     
-    func setFirstCharctersColor(label : String, count : Int){
-        let range = NSRange(location:0,length:count)
-        let attributedString = NSMutableAttributedString(string: label)
+    //CHANGE VERSE NUMBER COLOR
+    
+    func changeColor(text: String, forFirstCharacterCount count: Int) -> NSAttributedString {
+        let range = NSRange(location:0, length:count)
         let lightBlue = UIColor(red: 0.0, green: 122.0/255.0, blue: 1.0, alpha: 1)
+        let attributedString = NSMutableAttributedString(string: text)
         
         attributedString.addAttribute(NSForegroundColorAttributeName, value: lightBlue, range: range)
-        verseLabel.attributedText = attributedString
+        return attributedString
     }
     
-    func underlineTranslationLabel() {
-        let attributedString = NSMutableAttributedString(string: translationLabel.text!)
+    func underline(_ string: String) -> NSAttributedString {
+        let attributedString = NSMutableAttributedString(string: string)
         attributedString.addAttribute(NSUnderlineStyleAttributeName, value: NSUnderlineStyle.styleSingle.rawValue, range: NSRange(location: 0, length: attributedString.length - 1))
-        translationLabel.attributedText = attributedString
+        return attributedString
     }
     
     

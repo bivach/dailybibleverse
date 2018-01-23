@@ -13,6 +13,7 @@ import GoogleMobileAds
 import SafariServices
 import Social
 import FBSDKShareKit
+import TwitterKit
 
 class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewControllerDelegate {
     
@@ -126,29 +127,19 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
-            if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter) {
-                let string = "\(scriptureData.share_link!)"
-                let url = URL(string : string)
-                let post = SLComposeViewController(forServiceType: SLServiceTypeTwitter)!
-                post.setInitialText("\(scriptureData.tweet!)")
-                post.add(url)
-                self.present(post, animated: true, completion: nil)
-            } else {
-                
-                let urlstring = "\(scriptureData.tweet!) \(scriptureData.share_link!)"
-                
-                let urlComponents = NSURLComponents(string: "https://twitter.com/intent/tweet")
-                
-                urlComponents!.queryItems = [NSURLQueryItem(name: "text", value: urlstring.replacingOccurrences(of: ";", with: "")) as URLQueryItem]
-                
-                let url = urlComponents!.url!
-                
-                if #available(iOS 9.0, *) {
-                    let svc = SFSafariViewController(url: url)
-                    svc.delegate = self
-                    self.present(svc, animated: true, completion: nil)
+            // Swift
+            let composer = TWTRComposer()
+            let urlstring = scriptureData.share_link
+            let url = URL(string: urlstring!)
+            composer.setText(scriptureData.tweet)
+            composer.setURL(url)
+            
+            // Called from a UIViewController
+            composer.show(from: self.navigationController!) { (result) in
+                if (result == .done) {
+                    print("Successfully composed Tweet")
                 } else {
-                    debugPrint("Not available")
+                    print("Cancelled composing")
                 }
             }
         }
@@ -166,12 +157,29 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             showMenu(false)
             let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
-            let activityVc = UIActivityViewController(activityItems: [scriptureData.share_link!], applicationActivities: nil)
+            
+            let allVersesString = NSMutableAttributedString(string: "")
+            let size = scriptureData.verses.count
+            var count = 1
+            for verse in scriptureData.verses {
+                let string = "\(verse.verse_no ?? 1) \(verse.verse_text!)"
+                allVersesString.append(NSAttributedString(string: string))
+                if(size != count) {
+                    allVersesString.append(NSAttributedString(string: "\n"))
+                    allVersesString.append(NSAttributedString(string: "\n"))
+                }
+                count = count + 1
+            }
+            
+            let stringToShare = "\(scriptureData.book_name!) \(scriptureData.span!) \n\(allVersesString.string) \n\(scriptureData.share_link!)"
+            
+            let text = [stringToShare]
+            
+            let activityVc = UIActivityViewController(activityItems: text, applicationActivities: nil)
             activityVc.popoverPresentationController?.sourceView = self.view
             self.present(activityVc, animated: true, completion: nil)
         }
     }
-    
     func showGooglePlusShare(shareURL: NSURL) {
         
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
@@ -182,7 +190,22 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             
             let urlComponents = NSURLComponents(string: "https://plus.google.com/share")
             
-            urlComponents!.queryItems = [NSURLQueryItem(name: "url", value: shareURL!.absoluteString) as URLQueryItem]
+            
+            let allVersesString = NSMutableAttributedString(string: "")
+            let size = scriptureData.verses.count
+            var count = 1
+            for verse in scriptureData.verses {
+                let string = "\(verse.verse_no ?? 1) \(verse.verse_text!)"
+                allVersesString.append(NSAttributedString(string: string))
+                if(size != count) {
+                    allVersesString.append(NSAttributedString(string: "\n"))
+                    allVersesString.append(NSAttributedString(string: "\n"))
+                }
+                count = count + 1
+            }
+            
+            
+            urlComponents!.queryItems = [NSURLQueryItem(name: "text", value: "\(scriptureData.book_name!) \(scriptureData.span!) \n\(allVersesString.string)") as URLQueryItem,NSURLQueryItem(name: "url", value: shareURL!.absoluteString) as URLQueryItem]
             
             let url = urlComponents!.url!
             
@@ -243,11 +266,18 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
             self.translationLabel.attributedText = underline(translationText)
 
             let allVersesString = NSMutableAttributedString(string: "")
+            let size = script.verses.count
+            var count = 1
             for verse in script.verses {
                 let x = "\(verse.verse_no ?? 1)".count
-                let verseString = changeColor(text: verse.verse_text!, forFirstCharacterCount: x)
+                let string = "\(verse.verse_no ?? 1) \(verse.verse_text!)"
+                let verseString = changeColor(text: string, forFirstCharacterCount: x)
                 allVersesString.append(verseString)
-                allVersesString.append(NSAttributedString(string: "\n"))
+                if(size != count) {
+                    allVersesString.append(NSAttributedString(string: "\n"))
+                    allVersesString.append(NSAttributedString(string: "\n"))
+                }
+                count = count + 1
             }
             self.verseLabel.attributedText = allVersesString
 
@@ -331,11 +361,18 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         }
         
         let allVersesString = NSMutableAttributedString(string: "")
+        let size = scriptureData.verses.count
+        var count = 1
         for verse in scriptureData.verses {
             let x = "\(verse.verse_no ?? 1)".count
-            let verseString = changeColor(text: verse.verse_text!, forFirstCharacterCount: x)
+             let string = "\(verse.verse_no ?? 1) \(verse.verse_text!)"
+            let verseString = changeColor(text: string, forFirstCharacterCount: x)
             allVersesString.append(verseString)
-            allVersesString.append(NSAttributedString(string: "\n"))
+            if(size != count) {
+                allVersesString.append(NSAttributedString(string: "\n"))
+                allVersesString.append(NSAttributedString(string: "\n"))
+            }
+            count = count + 1
         }
         self.verseLabel.attributedText = allVersesString
         

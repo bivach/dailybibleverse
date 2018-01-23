@@ -47,6 +47,15 @@ class LocalStorage {
         return userDefaults.object(forKey: hasReminderKey) as? Bool ?? false
     }
     
+    func saveTimeReminderKey(_ timeReminder: String) {
+        userDefaults.set(timeReminder, forKey: timeReminderKey)
+        userDefaults.synchronize()
+    }
+    
+    func getTimeReminderKey() -> String {
+        return userDefaults.object(forKey: timeReminderKey) as? String ?? "08:00"
+    }
+    
     //MARK: DidTranslationChange
     
     func setDidTranslationChange(_ bool: Bool) {

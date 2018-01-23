@@ -17,7 +17,8 @@ target ‘dailybibleverse’ do
   pod 'FBSDKShareKit'
   pod 'FBSDKLoginKit'
   pod 'Google-Mobile-Ads-SDK'
-  pod 'RealmSwift' 
+  pod 'RealmSwift'
+  pod 'TwitterKit'
 
 end
 

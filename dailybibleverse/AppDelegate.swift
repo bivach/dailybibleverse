@@ -11,6 +11,7 @@ import CoreData
 import GoogleMobileAds
 import FBSDKCoreKit
 import UserNotifications
+import TwitterKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -52,7 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 
             }
         }
-        
+        Twitter.sharedInstance().start(withConsumerKey:"piJYwNpTii8g3eQcbD745XDfj", consumerSecret:"0rLSM41Q8dBUlF8qUxW4D4pMW82kVxdRXGVs1daHn2IdDgcIzg")
         UNUserNotificationCenter.current().delegate = self
         sharedLocalStorage.saveFirstTimeLaunchingApp(false)
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -76,6 +77,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         print("Handle push from background or closed")
         // if you set a member variable in didReceiveRemoteNotification, you will know if this is from closed or background
         print("\(response.notification.request.content.userInfo)")
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        return Twitter.sharedInstance().application(app, open: url, options: options)
     }
     
     
