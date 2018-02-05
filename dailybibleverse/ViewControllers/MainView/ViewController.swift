@@ -128,20 +128,28 @@ class ViewController: UIViewController, GADBannerViewDelegate, SFSafariViewContr
         if case .success(let mergeDailyVerseResponse) = viewModel.state.value {
             let scriptureData : ScriptureData = sharedLocalStorage.getBibleVersion() == 1 ? mergeDailyVerseResponse.getScriptureDataKJV() : mergeDailyVerseResponse.getScriptureDataNIV()
             // Swift
-            let composer = TWTRComposer()
-            let urlstring = scriptureData.share_link
-            let url = URL(string: urlstring!)
-            composer.setText(scriptureData.tweet)
-            composer.setURL(url)
+//            let composer = TWTRComposer()
+//           let urlstring = scriptureData.share_link
+//           let url = URL(string: urlstring!)
+//            composer.setText(scriptureData.tweet)
+//            composer.setURL(url)
+//
+//            // Called from a UIViewController
+//            composer.show(from: self.navigationController!) { (result) in
+//                if (result == .done) {
+//                    print("Successfully composed Tweet")
+//                } else {
+//                    print("Cancelled composing")
+//                }
+//            }
             
-            // Called from a UIViewController
-            composer.show(from: self.navigationController!) { (result) in
-                if (result == .done) {
-                    print("Successfully composed Tweet")
-                } else {
-                    print("Cancelled composing")
-                }
+            let viewController = TWTRComposerViewController(initialText: "\(scriptureData.tweet!) \(scriptureData.share_link!)", image: nil, videoData: nil)
+            present(viewController, animated: false) {
+                if let textView = viewController.view!.subviews.first!.subviews.first!.subviews.first!.subviews.first!.subviews.first!.subviews.first!.subviews[1].subviews[1] as? UITextView{
+                    textView.deleteBackward()
+                    }
             }
+
         }
     }
     

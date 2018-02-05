@@ -158,20 +158,27 @@ class FavoriteDetailViewController : UIViewController, GADBannerViewDelegate, SF
     @IBAction func twitterShareButton(_ sender: Any) {
         let tweet = localStorage.getBibleVersion() == 1 ? realmFavorite!["tweetKJV"]! :realmFavorite!["tweetNIV"]!
         let string = "\(realmFavorite!["share_link"]!)"
-        let url = URL(string : string)
+//        let url = URL(string : string)
+//
+//        // Swift
+//        let composer = TWTRComposer()
+//
+//        composer.setText(tweet as? String)
+//        composer.setURL(url)
+//
+//        // Called from a UIViewController
+//        composer.show(from: self.navigationController!) { (result) in
+//            if (result == .done) {
+//                print("Successfully composed Tweet")
+//            } else {
+//                print("Cancelled composing")
+//            }
+//        }
         
-        // Swift
-        let composer = TWTRComposer()
-        
-        composer.setText(tweet as? String)
-        composer.setURL(url)
-        
-        // Called from a UIViewController
-        composer.show(from: self.navigationController!) { (result) in
-            if (result == .done) {
-                print("Successfully composed Tweet")
-            } else {
-                print("Cancelled composing")
+        let viewController = TWTRComposerViewController(initialText: "\(tweet) \(string)", image: nil, videoData: nil)
+        present(viewController, animated: false) {
+            if let textView = viewController.view!.subviews.first!.subviews.first!.subviews.first!.subviews.first!.subviews.first!.subviews.first!.subviews[1].subviews[1] as? UITextView{
+                textView.deleteBackward()
             }
         }
     }
